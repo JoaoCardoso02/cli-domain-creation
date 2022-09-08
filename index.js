@@ -10,9 +10,10 @@ const generateTypesFile = require('./generateTypesFile')
 
 function createDomain() {
 	const { domainName, pluralDomainName } = getDomainNameAndPluralDomainName()
+
 	const attributes = getAttributeWithTypes()
 	createDomainFolder(domainName)
-	createDomainFiles(domainName)
+	createDomainFiles(domainName, attributes)
 }
 
 
@@ -48,10 +49,16 @@ function getAttributeWithTypes() {
 	do {
 		attributes.push({
 			name: prompt('What is the attribute name?'),
-			type: prompt('What is the attribute type?')
+			type: prompt('What is the attribute type?'),
+			isRequired: false
 		})
 
-	} while ((attributes[attributes.length - 1]?.name && attributes[attributes.length - 1]?.name));
+		const isRequired = prompt('Is the attribute required?').toLowerCase()
+		if (isRequired === 'y' || isRequired === 'yes') attributes[attributes.length - 1].isRequired = true
+
+	} while ((attributes[attributes.length - 1]?.name && attributes[attributes.length - 1]?.type));
+
+	delete attributes[attributes.length - 1]
 
 	return attributes
 }
@@ -75,11 +82,11 @@ function checkAndCreateFolder(pathName, folderName) {
 	}
 }
 
-function createDomainFiles(domainName) {
-	generateServiceFile(path.resolve('.', 'domain', domainName), domainName)
-	generateEntityFile(path.resolve('.', 'domain', domainName), domainName)
-	generateInfrastructureFile(path.resolve('.', 'domain', domainName), domainName)
-	generateTypesFile(path.resolve('.', 'domain', domainName), domainName)
+function createDomainFiles(domainName, attributes) {
+	generateServiceFile(path.resolve('.', 'domain', domainName), domainName, attributes)
+	generateEntityFile(path.resolve('.', 'domain', domainName), domainName, attributes)
+	generateInfrastructureFile(path.resolve('.', 'domain', domainName), domainName, attributes)
+	generateTypesFile(path.resolve('.', 'domain', domainName), domainName, attributes)
 }
 
 createDomain()
