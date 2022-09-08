@@ -10,6 +10,7 @@ const generateTypesFile = require('./generateTypesFile')
 
 function createDomain() {
 	const { domainName, pluralDomainName } = getDomainNameAndPluralDomainName()
+	const attributes = getAttributeWithTypes()
 	createDomainFolder(domainName)
 	createDomainFiles(domainName)
 }
@@ -39,6 +40,20 @@ function getPluralDomainName(name) {
 	if (pluralDomainName) return pluralDomainName
 
 	return pluralize(name)
+}
+
+function getAttributeWithTypes() {
+	let attributes = []
+
+	do {
+		attributes.push({
+			name: prompt('What is the attribute name?'),
+			type: prompt('What is the attribute type?')
+		})
+
+	} while ((attributes[attributes.length - 1]?.name && attributes[attributes.length - 1]?.name));
+
+	return attributes
 }
 
 function createDomainFolder(domainName) {
