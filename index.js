@@ -3,6 +3,11 @@ const fs = require('fs')
 const prompt = require("prompt-sync")();
 const pluralize = require('pluralize')
 
+const generateEntityFile = require('./generateEntityFile')
+const generateServiceFile = require('./generateServiceFile')
+const generateInfrastructureFile = require('./generateInfrastructureFile')
+const generateTypesFile = require('./generateTypesFile')
+
 function createDomain() {
 	const { domainName, pluralDomainName } = getDomainNameAndPluralDomainName()
 	createDomainFolder(domainName)
@@ -56,26 +61,10 @@ function checkAndCreateFolder(pathName, folderName) {
 }
 
 function createDomainFiles(domainName) {
-	const domainNameCapitalized = capitalizeString(domainName)
-
-	checkAndCreateFile(path.resolve('.', 'domain', domainName, 'entities'), `${domainNameCapitalized}.ts`)
-	checkAndCreateFile(path.resolve('.', 'domain', domainName, 'services'), `${domainNameCapitalized}Service.ts`)
-	checkAndCreateFile(path.resolve('.', 'domain', domainName, 'infrastructure'), `${domainNameCapitalized}Repository.ts`)
-	checkAndCreateFile(path.resolve('.', 'domain', domainName, 'types'), `I${domainNameCapitalized}.ts`)
-
-	checkAndCreateFile(path.resolve('.', 'domain', domainName, 'entities', '__tests__'), `${domainNameCapitalized}.spec.ts`)
-	checkAndCreateFile(path.resolve('.', 'domain', domainName, 'services', '__tests__'), `${domainNameCapitalized}Service.spec.ts`)
-	checkAndCreateFile(path.resolve('.', 'domain', domainName, 'infrastructure', '__tests__'), `${domainNameCapitalized}Repository.spec.ts`)
-}
-
-function checkAndCreateFile(pathName, fileName) {
-	if (!fs.existsSync(path.resolve(pathName, fileName))) {
-		fs.writeFileSync(path.resolve(pathName, fileName), 'something')
-	}
-}
-
-function capitalizeString(name) {
-	return name.charAt(0).toUpperCase() + name.slice(1);
+	generateServiceFile(path.resolve('.', 'domain', domainName), domainName)
+	generateEntityFile(path.resolve('.', 'domain', domainName), domainName)
+	generateInfrastructureFile(path.resolve('.', 'domain', domainName), domainName)
+	generateTypesFile(path.resolve('.', 'domain', domainName), domainName)
 }
 
 createDomain()
