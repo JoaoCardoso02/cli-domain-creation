@@ -7,9 +7,10 @@ module.exports = function generateEntityFile(pathName, domainName, attributes) {
 	const domainNameCapitalized = capitalizeString(domainName)
 
 	const content = generateFileContent(domainNameCapitalized, attributes)
+	const typeContent = generateTestFileContent(domainName, domainNameCapitalized, attributes)
 
 	checkAndCreateFile(path.resolve(pathName, 'entities'), `${domainNameCapitalized}.ts`, content)
-	checkAndCreateFile(path.resolve(pathName, 'entities', '__tests__'), `${domainNameCapitalized}.spec.ts`)
+	checkAndCreateFile(path.resolve(pathName, 'entities', '__tests__'), `${domainNameCapitalized}.spec.ts`, typeContent)
 }
 
 function generateFileContent(domainName, attributes) {
@@ -39,5 +40,35 @@ function generateFileContent(domainName, attributes) {
 	`).join('\n	')
 	}
 }
+`
+}
+
+function generateTestFileContent(domainName, domainCapitalizedName, attributes) {
+	const typeNameCapitalized = `I${domainCapitalizedName}`
+
+	return `import { ${typeNameCapitalized} } from '../../types/${typeNameCapitalized}'
+import ${domainCapitalizedName} from '../${domainCapitalizedName}'
+
+describe('${domainCapitalizedName}', () => {
+	it('should create a new ${domainName}', () => {
+		const data: ${typeNameCapitalized} = {
+			${attributes.map((attribute) => 
+				`${attribute.name}: ${attribute.type === 'string' ? `'fake ${attribute.name}'` : attribute.type === 'number' ? 12345 : attribute.type === 'Date' ? new Date() : null}`).join(',\n			')
+			}
+		}
+
+		const result = new ${domainCapitalizedName}(data)
+
+		expect(result).toEqual(data)
+	})
+
+	it('should throw to create a new ${domainName} if data is invalid', () => {
+		const data = {} as unknown as ${typeNameCapitalized}
+
+		expect(() => {
+			new ${domainCapitalizedName}(data)
+		}).toThrow()
+	})
+})
 `
 }
